@@ -17,6 +17,9 @@ exclude = ["read", "audio", "kindle", "book", "library", "favorite", "favourite"
 book_tags = book_tags.query('tag_name not in {}'.format(stop_tags))
 book_tags = book_tags.set_index("goodreads_book_id")
 
+# Then split by "-".
+
+
 for word in exclude:
 
     book_tags = book_tags[~book_tags["tag_name"].str.contains(word)]
