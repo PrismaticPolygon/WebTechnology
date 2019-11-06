@@ -22,3 +22,4 @@ Database should consist of two tables:
 * Interaction is more important than layout
 * Best way to submit is to provide a URL to a working system
 * Only implement one recommender algorithm
+* Example [here](https://github.com/wyo9057/movie_recommender_system).

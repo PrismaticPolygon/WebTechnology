@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h4>RATINGS</h4>
+<ul>
+    {% for rating in ratings %}
+        <li>{{ rating }}</li>
+    {% endfor %}
+</ul>
+
+<h4>RECOMMENDATIONS</h4>
+<ul>
+    {% for recommendation in recommendations %}
+        <li>{{ recommendation }}</li>
+    {% endfor %}
+</ul>
+
+
+
+</body>
+</html>
