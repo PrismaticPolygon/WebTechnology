@@ -47,3 +47,11 @@ recommendation algorithm. [50]
 4. Provide a suitable interface for a user to interact with the system, supporting user profile
 creation and/or update and receiving book recommendations
 
+## TODO
+
+- [ ] Update home page to show books
+- [ ] Import Goodreads data into database
+- [ ] Add German to available languages
+- [ ] Remove pagination
+- [ ] Update user page to show their rated books
+- [ ] Remove messaging

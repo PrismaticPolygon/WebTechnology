@@ -4,6 +4,8 @@ import shutil
 
 # Load the datasets that we need
 
+# These basically define relationships, right?
+
 books = pd.read_csv("raw/books.csv", index_col="goodreads_book_id")
 book_tags = pd.read_csv("raw/book_tags.csv")
 tags = pd.read_csv("raw/tags.csv", index_col="tag_id")

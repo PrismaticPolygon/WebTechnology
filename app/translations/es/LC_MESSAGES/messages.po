@@ -153,10 +153,6 @@ msgstr "Tu mensaje ha sido enviado."
 msgid "Send Message"
 msgstr "Enviar Mensaje"
 
-#: app/main/routes.py:197
-msgid "An export task is currently in progress"
-msgstr "Una tarea de exportación esta en progreso"
-
 #: app/main/routes.py:199
 msgid "Exporting posts..."
 msgstr "Exportando artículos..."

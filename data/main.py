@@ -31,14 +31,6 @@ books_with_genres = books.join(pd.DataFrame(mlb.fit_transform(books.pop('genres'
                                                         columns=mlb.classes_,
                                                         index=books.index))
 
-# Too much data?
-# Is there a solution?
-# If it's all in a table?
-
-# But right now, I feel like I can't be bothered.
-# It was working with my small dataset
-# I'm not building a Netflix-style recommendation store.
-
 books.set_index("book_id", inplace=True)
 
 merged = pd.merge(books_with_genres, ratings, on="book_id")

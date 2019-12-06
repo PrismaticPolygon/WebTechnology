@@ -27,6 +27,7 @@ def before_request():
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+
     form = PostForm()
 
     if form.validate_on_submit():
@@ -81,6 +82,7 @@ def explore():
 @bp.route('/user/<username>')
 @login_required
 def user(username):
+
     user = User.query.filter_by(username=username).first_or_404()
 
     page = request.args.get('page', 1, type=int)
@@ -263,23 +265,6 @@ def messages():
                            messages=messages.items,
                            next_url=next_url,
                            prev_url=prev_url)
-
-
-@bp.route('/export_posts')
-@login_required
-def export_posts():
-
-    if current_user.get_task_in_progress('export_posts'):
-
-        flash(_('An export task is currently in progress'))
-
-    else:
-
-        current_user.launch_task('export_posts', _('Exporting posts...'))
-
-        db.session.commit()
-
-    return redirect(url_for('main.user', username=current_user.username))
 
 
 @bp.route('/notifications')
