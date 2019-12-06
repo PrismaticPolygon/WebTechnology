@@ -1,9 +1,10 @@
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
 
-books = pd.read_csv("data/books.csv")
-ratings = pd.read_csv("data/ratings.csv", index_col=["user_id", "book_id"])
+books = pd.read_csv("C:/Users/user/PycharmProjects/WebTechnology/data/books.csv")
+ratings = pd.read_csv("C:/Users/user/PycharmProjects/WebTechnology/data/ratings.csv", index_col=["user_id", "book_id"])
 
+# C:\Users\user\PycharmProjects\WebTechnology\data\books.csv
 
 def create_rating(user_id, book_id, rating):
 
@@ -30,6 +31,14 @@ books_with_genres = books.join(pd.DataFrame(mlb.fit_transform(books.pop('genres'
                                                         columns=mlb.classes_,
                                                         index=books.index))
 
+# Too much data?
+# Is there a solution?
+# If it's all in a table?
+
+# But right now, I feel like I can't be bothered.
+# It was working with my small dataset
+# I'm not building a Netflix-style recommendation store.
+
 books.set_index("book_id", inplace=True)
 
 merged = pd.merge(books_with_genres, ratings, on="book_id")
@@ -40,14 +49,19 @@ def get_user_ratings(user_id):
 
     return pd.merge(books, user_ratings, left_index=True, right_index=True).to_dict("records")
 
+# Ah. It seems to be too large.
 
 def get_user_recommendations(user_id):
 
     user_ratings = ratings.loc[(user_id,)]
     user_genres = merged.drop(["title", "rating", "author", "year"], axis=1)
 
-    # user_ratings.set_index("book_id", inplace=True)
+    # Matrices are not aligned.
+
     user_genres.set_index("book_id", inplace=True)
+
+    print(user_ratings)
+    print(user_genres)
 
     profile = user_genres.T.dot(user_ratings.rating)
 
