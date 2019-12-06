@@ -42,4 +42,4 @@ nosetests.xml
 
 venv
 app.db
-microblog.log*
+Bookler.log*
