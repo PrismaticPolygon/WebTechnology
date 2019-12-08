@@ -60,3 +60,4 @@ books = books.set_index("book_id")
 books.to_csv("goodreads/books.csv")
 
 shutil.move("raw/ratings.csv", "goodreads/ratings.csv")
+

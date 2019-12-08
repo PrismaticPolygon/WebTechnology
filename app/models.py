@@ -90,17 +90,17 @@ class User(UserMixin, db.Model):
 
     ratings = db.relationship("Rating", backref="rater", lazy="dynamic")
 
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
-    about_me = db.Column(db.String(140))
-    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    token = db.Column(db.String(32), index=True, unique=True)
-    token_expiration = db.Column(db.DateTime)
-
-    followed = db.relationship(
-        'User', secondary=followers,
-        primaryjoin=(followers.c.follower_id == id),
-        secondaryjoin=(followers.c.followed_id == id),
-        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
+    # posts = db.relationship('Post', backref='author', lazy='dynamic')
+    # about_me = db.Column(db.String(140))
+    # last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    # token = db.Column(db.String(32), index=True, unique=True)
+    # token_expiration = db.Column(db.DateTime)
+    #
+    # followed = db.relationship(
+    #     'User', secondary=followers,
+    #     primaryjoin=(followers.c.follower_id == id),
+    #     secondaryjoin=(followers.c.followed_id == id),
+    #     backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     def __repr__(self):
 
@@ -215,10 +215,21 @@ class Post(SearchableMixin, db.Model):
 
         return '<Post {}>'.format(self.body)
 
+class Rating(db.Model):
 
-class Book(SearchableMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey("book.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    value = db.Column(db.Integer)
 
-    __searchable__ = ['title']
+    def __repr__(self):
+
+        return '<Rating {} {} {}>'.format(self.user_id, self.book_id, self.value)
+
+
+class Book(db.Model):
+
+    # __searchable__ = ['title']
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(140))
@@ -227,3 +238,24 @@ class Book(SearchableMixin, db.Model):
     def __repr__(self):
 
         return '<Book {}>'.format(self.title)
+
+class BookTag(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey("tag.id"))
+    book_id = db.Column(db.Integer, db.ForeignKey("book.id"))
+    count = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<BookTag {} {} {}>'.format(self.book_id, self.tag_id, self.count)
+
+
+class Tag(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140))
+
+    def __repr__(self):
+
+        return '<Book {}>'.format(self.name)
+
