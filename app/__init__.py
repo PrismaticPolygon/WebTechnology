@@ -22,6 +22,8 @@ bootstrap = Bootstrap()
 moment = Moment()
 babel = Babel()
 
+# It's not working. And it's all got... rather complex.
+# This is kinda why I should have built it up myself. Which, to be fair, I guess I did, for most of it.
 
 def create_app(config_class=Config):
 
