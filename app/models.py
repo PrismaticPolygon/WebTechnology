@@ -106,6 +106,16 @@ class User(UserMixin, db.Model):
 
         return '<User {}>'.format(self.username)
 
+    def get_recommendations(self):
+
+        # Of course, it's not quite that simple.
+        # So let's get everything ship-shape here first.
+
+        ratings = self.ratings.all()
+
+
+
+
     def set_password(self, password):
 
         self.password_hash = generate_password_hash(password)

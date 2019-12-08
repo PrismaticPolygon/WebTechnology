@@ -63,11 +63,11 @@ msgid "Register"
 msgstr "Registrarse"
 
 #: app/auth/forms.py:28 app/main/forms.py:23
-msgid "Please use a different username."
+msgid "That username is already taken. Please use another."
 msgstr "Por favor use un nombre de usuario diferente."
 
 #: app/auth/forms.py:33
-msgid "Please use a different email address."
+msgid "That email address is already taken. Please use another."
 msgstr "Por favor use una dirección de email diferente."
 
 #: app/auth/forms.py:38 app/auth/forms.py:46

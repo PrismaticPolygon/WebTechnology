@@ -26,7 +26,7 @@ class EditProfileForm(FlaskForm):
 
             if user is not None:
 
-                raise ValidationError(_('Please use a different username.'))
+                raise ValidationError(_('That username is already taken. Please use another.'))
 
 
 class PostForm(FlaskForm):
