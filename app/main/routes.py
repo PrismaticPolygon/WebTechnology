@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from flask_babel import _, get_locale
 from app import db
 from app.main.forms import EditProfileForm, SearchForm
-from app.models import User, Post
+from app.models import User, Post, Book
 from app.translate import translate
 from app.main import bp
 
@@ -24,7 +24,9 @@ def before_request():
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
 
-    return render_template('index.html', title=_('Home'))
+    books = Book.query.all()
+
+    return render_template('index.html', title=_('Home'), books=books)
 
 
 @bp.route('/user/<username>')
