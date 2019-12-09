@@ -5,6 +5,10 @@ from app.models import Book, BookTag, Rating, Tag, User
 import csv
 import pandas as pd
 
+# So. We need a Boolean for each kind of genre. That's fine. I'll reduce the number to make it reasonable.
+NUMBER_OF_USERS = 100
+TAG_MAP = dict()    # Holds a map: old tag_id to new tag_id.
+
 def load(file_name):
 
     with open(file_name, encoding="utf-8") as file:
@@ -32,27 +36,58 @@ def import_users():
 
         return user
 
-    return list(map(lambda i: make_user(i), range(53424)))
+    return list(map(lambda i: make_user(i), range(NUMBER_OF_USERS)))
 
 def import_ratings():
 
     file_name = "D:/Dev/PycharmProjects/WebTechnology/data/parsed/ratings.csv"
     data = load(file_name)
 
-    return list(map(lambda i: Rating(**{
-        "book_id": int(i["book_id"]),
-        "user_id": int(i["user_id"]),
-        "value": int(i["rating"])
-    }), data))
+    ratings = list()
+
+    for i in data:
+
+        if int(i["user_id"]) < NUMBER_OF_USERS:
+
+            rating = Rating(**{
+                "book_id": int(i["book_id"]),
+                "user_id": int(i["user_id"]),
+                "value": int(i["rating"])
+            })
+
+            ratings.append(rating)
+
+    return ratings
 
 def import_tags():
+
+    # https://reference.yourdictionary.com/books-literature/different-types-of-books.html. There are 44.
+    genres = ['action', 'adventure', 'art', 'autobiography', 'anthology', 'biography', "childrens", 'cookbook',
+              'comic', 'diary', 'dictionary', 'crime', 'encyclopedia', 'drama', 'guide', 'fairytale', 'health',
+              'fantasy', 'history', 'graphic', 'journal', 'historical', 'math', 'horror', 'memoir', 'mystery', 'prayer',
+              'paranormal', 'religion', 'picture', 'textbook', 'poetry', 'review', 'political', 'crime', 'science',
+              'romance', 'satire', 'travel', 'scifi', 'short', 'suspense', 'thriller', 'ya']
 
     file_name = "D:/Dev/PycharmProjects/WebTechnology/data/raw/tags.csv"
     data = load(file_name)
 
-    return list(map(lambda i: Tag(**{
-        "name": i["tag_name"],
-    }), data))
+    tags = list()
+
+    for index, item in enumerate(data):
+
+        name = item["tag_name"].split("-")
+
+        if name in genres:
+
+            tag =  Tag(**{
+                "name": name
+            })
+
+            tags.append(tag)
+
+            TAG_MAP[index] = len(tags)
+
+    return tags
 
 def import_book_tags():
 
@@ -60,6 +95,14 @@ def import_book_tags():
     book_tags = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/data/raw/book_tags.csv")
 
     merge = pd.merge(books, book_tags, on="goodreads_book_id")[["book_id", "tag_id", "count"]]
+
+    # Filter out tags that we've nuked.
+    merge = merge[merge.tag_id.isin(TAG_MAP.keys())]
+
+    # Replace the old tag id with the new tag id
+    merge["tag_id"] = merge["tag_id"].map(lambda x: TAG_MAP[x])
+
+    merge.to_csv("D:/Dev/PycharmProjects/WebTechnology/data/raw/book_tags.csv")
 
     book_tags = list()
 

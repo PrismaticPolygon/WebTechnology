@@ -42,8 +42,11 @@ def get_user_ratings(user_id):
     return pd.merge(books, user_ratings, left_index=True, right_index=True).to_dict("records")
 
 # Ah. It seems to be too large.
+#
 
 def get_user_recommendations(user_id):
+
+    # I mean, I have it here.
 
     user_ratings = ratings.loc[(user_id,)]
     user_genres = merged.drop(["title", "rating", "author", "year"], axis=1)

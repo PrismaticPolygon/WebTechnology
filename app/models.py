@@ -103,6 +103,29 @@ class User(UserMixin, db.Model):
 
     def get_recommendations(self):
 
+        # So the first one is my writing, right?
+        # Yeah. Let's pre-generate it.
+
+        """
+
+        SELECT t2.movie
+        FROM movies t1 INNER JOIN movies t2
+             ON t1.user = 1
+             AND t2.user IN(2,3,4,5,6,7)
+             AND t2.movie NOT IN ( SELECT movie
+                                   FROM movies
+                                   WHERE user = 1 )
+        GROUP BY(t2.movie)
+        HAVING AVG(t2.rating)>=3
+        AND  COUNT(DISTINCT t2.user) >= 3
+
+        """
+
+        recommendations = Book.join(Book, )
+
+        # Lol. Far better to create this table ahead of time.
+        # Cause it's going to be HUGE.
+
         # Of course, it's not quite that simple.
         # So let's get everything ship-shape here first.
 
