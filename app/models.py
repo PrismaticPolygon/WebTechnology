@@ -1,7 +1,6 @@
 import base64
 from datetime import datetime, timedelta
 from hashlib import md5
-import json
 import os
 from time import time
 from flask import current_app, url_for
@@ -71,16 +70,6 @@ class SearchableMixin(object):
             add_to_index(cls.__tablename__, obj)
 
 
-db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
-
-followers = db.Table(
-    'followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
-)
-
-
 class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -106,12 +95,18 @@ class User(UserMixin, db.Model):
 
         return '<User {}>'.format(self.username)
 
+    def get_ratings(self):
+
+        ratings = self.ratings.join(Book).add_columns(Book.title).all()
+
+        return list(map(lambda x: {"title": x[1], "rating": x[0].value}, ratings))
+
     def get_recommendations(self):
 
         # Of course, it's not quite that simple.
         # So let's get everything ship-shape here first.
 
-        ratings = self.ratings.all()
+        ratings = self.ratings.query(Book)
 
 
 

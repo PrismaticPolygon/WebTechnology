@@ -35,9 +35,9 @@ def user(username):
 
     user = User.query.filter_by(username=username).first_or_404()
 
-    # page = request.args.get('page', 1, type=int)
+    ratings = user.get_ratings()
 
-    return render_template('user.html', user=user)
+    return render_template('user.html', user=user, ratings=ratings)
 
 
 @bp.route('/edit_profile', methods=['GET', 'POST'])

@@ -105,10 +105,10 @@ if __name__ == "__main__":
 
         except Exception as e:
 
-            print("Error: ", e)
+            print("ERROR: ", e)
 
         finally:
 
             s.close()
 
-        print("Time elapsed: {}s".format(str(time() - t)))  # 0.091s
+        print("Time elapsed: {}s\n".format(str(time() - t)))  # 0.091s

@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
 
+# Okay. Now we're actually doing the recommender. And so I'll go to Tesco's.
+
 books = pd.read_csv("C:/Users/user/PycharmProjects/WebTechnology/data/books.csv")
 ratings = pd.read_csv("C:/Users/user/PycharmProjects/WebTechnology/data/ratings.csv", index_col=["user_id", "book_id"])
 
