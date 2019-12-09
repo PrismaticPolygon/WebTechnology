@@ -148,26 +148,6 @@ class User(UserMixin, db.Model):
 
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
 
-    def get_reset_password_token(self, expires_in=600):
-
-        return jwt.encode(
-            {'reset_password': self.id, 'exp': time() + expires_in},
-            current_app.config['SECRET_KEY'],
-            algorithm='HS256').decode('utf-8')
-
-    @staticmethod
-    def verify_reset_password_token(token):
-
-        try:
-
-            id = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
-
-        except:
-
-            return
-
-        return User.query.get(id)
-
     def to_dict(self):
 
         return {
@@ -190,22 +170,34 @@ class User(UserMixin, db.Model):
             self.set_password(data['password'])
 
     def get_token(self, expires_in=3600):
+
         now = datetime.utcnow()
+
         if self.token and self.token_expiration > now + timedelta(seconds=60):
+
             return self.token
+
         self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+
         self.token_expiration = now + timedelta(seconds=expires_in)
+
         db.session.add(self)
+
         return self.token
 
     def revoke_token(self):
+
         self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
 
     @staticmethod
     def check_token(token):
+
         user = User.query.filter_by(token=token).first()
+
         if user is None or user.token_expiration < datetime.utcnow():
+
             return None
+
         return user
 
 
@@ -213,21 +205,6 @@ class User(UserMixin, db.Model):
 def load_user(id):
 
     return User.query.get(int(id))
-
-
-class Post(SearchableMixin, db.Model):
-
-    __searchable__ = ['body']
-
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(140))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    language = db.Column(db.String(5))
-
-    def __repr__(self):
-
-        return '<Post {}>'.format(self.body)
 
 class Rating(db.Model):
 
@@ -248,8 +225,6 @@ class Rating(db.Model):
             "user_id": self.user_id,
             "value": self.value
         }
-
-
 
 class Book(db.Model):
 
@@ -299,7 +274,11 @@ class Tag(db.Model):
 
     def __repr__(self):
 
-        return '<Book {}>'.format(self.name)
+        return '<Tag {}>'.format(self.name)
+
+    def __eq__(self, other):
+
+        return self.name == other.name
 
     def to_dict(self):
 
