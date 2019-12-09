@@ -5,42 +5,94 @@ from app.models import Book, BookTag, Rating, Tag, User
 import csv
 import pandas as pd
 
-# So. We need a Boolean for each kind of genre. That's fine. I'll reduce the number to make it reasonable.
+NUMBER_OF_BOOKS = 10000
 NUMBER_OF_USERS = 100
 TAG_MAP = dict()    # Holds a map: old tag_id to new tag_id.
+GENRES = ['action', 'adventure', 'art', 'autobiography', 'anthology', 'biography', "childrens", 'cookbook',
+          'comic', 'diary', 'dictionary', 'crime', 'encyclopedia', 'drama', 'guide', 'fairytale', 'health',
+          'fantasy', 'history', 'graphic', 'journal', 'historical', 'math', 'horror', 'memoir', 'mystery', 'prayer',
+          'paranormal', 'religion', 'picture', 'textbook', 'poetry', 'review', 'political', 'crime', 'science',
+          'romance', 'satire', 'travel', 'scifi', 'short', 'suspense', 'thriller', 'ya']
 
 def load(file_name):
+    """
+    Load a file into a list of dictionaries
+    """
 
     with open(file_name, encoding="utf-8") as file:
 
         return [{k: v for k, v in row.items()} for row in csv.DictReader(file, skipinitialspace=True)]
 
+def write(file_name, data):
+    """
+    Write a db.Model object with a to_dict function to a CSV
+    """
+
+    with open(file_name, "w") as file:
+
+        writer = csv.DictWriter(file, fieldnames=data[0].keys())
+
+        for item in data:
+
+            writer.writerow(item.to_dict())
+
 def import_books():
 
-    file_name = "D:/Dev/PycharmProjects/WebTechnology/data/parsed/books.csv"
-    data = load(file_name)
+    books = pd.read_csv("raw/books.csv", index_col="book_id", usecols=["book_id", "title"])
+
+    # Add genres.
+    for genre in GENRES:
+
+        books[genre] = 0
+
+    print(books.head())
+
+    book_tags = pd.read_csv("parsed/book_tags.csv", index_col="tag_id")
+    tags = pd.read_csv("parsed/tags.csv", index_col="tag_id")
+
+    # Merge tags and book_tags on tag_id. Resulting table has book_id, tag_id, count, and tag_name
+
+    book_tags = book_tags.merge(tags, on="tag_id")
+
+    book_tags.reset_index()
+
+    book_tags = book_tags.set_index("book_id")
+
+    print(book_tags.head())
+
+    for index in range(NUMBER_OF_BOOKS):
+
+        for tag in book_tags.loc[index]:
+
+            books[index][tag] = 1
+
+    print(books.head())
+
+    books.to_csv("parsed/books.csv")
 
     return list(map(lambda i: Book(**{
         "title": i["title"],
         "genres": "None"
-    }), data))
+    }), books.to_dict("record")))
 
 def import_users():
 
-    def make_user(i):
+    users = list()
 
-        i += 1
+    for i in range(NUMBER_OF_USERS):
 
         user = User(username="user_" + str(i), email="user_" + str(i) + "@email.com")
         user.set_password("password_" + str(i))
 
-        return user
+        users.append(user)
 
-    return list(map(lambda i: make_user(i), range(NUMBER_OF_USERS)))
+    write("D:/Dev/PycharmProjects/WebTechnology/data/parsed/users.csv", users)
+
+    return users
 
 def import_ratings():
 
-    file_name = "D:/Dev/PycharmProjects/WebTechnology/data/parsed/ratings.csv"
+    file_name = "D:/Dev/PycharmProjects/WebTechnology/data/raw/ratings.csv"
     data = load(file_name)
 
     ratings = list()
@@ -56,6 +108,8 @@ def import_ratings():
             })
 
             ratings.append(rating)
+
+    write("D:/Dev/PycharmProjects/WebTechnology/data/parsed/ratings.csv", ratings)
 
     return ratings
 
@@ -87,6 +141,8 @@ def import_tags():
 
             TAG_MAP[index] = len(tags)
 
+    write("D:/Dev/PycharmProjects/WebTechnology/data/parsed/tags.csv", tags)
+
     return tags
 
 def import_book_tags():
@@ -102,7 +158,7 @@ def import_book_tags():
     # Replace the old tag id with the new tag id
     merge["tag_id"] = merge["tag_id"].map(lambda x: TAG_MAP[x])
 
-    merge.to_csv("D:/Dev/PycharmProjects/WebTechnology/data/raw/book_tags.csv")
+    merge.to_csv("D:/Dev/PycharmProjects/WebTechnology/data/parsed/book_tags.csv")
 
     book_tags = list()
 
@@ -120,11 +176,11 @@ if __name__ == "__main__":
     engine = create_engine('sqlite:///app.db')
 
     import_functions = [
-        import_books,
         import_users,
         import_ratings,
         import_tags,
-        import_book_tags
+        import_book_tags,
+        import_books,
     ]
 
     for import_function in import_functions:

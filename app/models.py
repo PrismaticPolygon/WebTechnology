@@ -168,26 +168,14 @@ class User(UserMixin, db.Model):
 
         return User.query.get(id)
 
-    def to_dict(self, include_email=False):
+    def to_dict(self):
 
         data = {
             'id': self.id,
             'username': self.username,
-            'last_seen': self.last_seen.isoformat() + 'Z',
-            'about_me': self.about_me,
-            'post_count': self.posts.count(),
-            'follower_count': self.followers.count(),
-            'followed_count': self.followed.count(),
-            '_links': {
-                'self': url_for('api.get_user', id=self.id),
-                'followers': url_for('api.get_followers', id=self.id),
-                'followed': url_for('api.get_followed', id=self.id),
-                'avatar': self.avatar(128)
-            }
+            'email': self.email,
+            'password_hash': self.password_hash
         }
-
-        if include_email:
-            data['email'] = self.email
 
         return data
 
@@ -254,6 +242,16 @@ class Rating(db.Model):
 
         return '<Rating {} {} {}>'.format(self.user_id, self.book_id, self.value)
 
+    def to_dict(self):
+
+        return {
+            "id": self.id,
+            "book_id": self.book_id,
+            "user_id": self.user_id,
+            "value": self.value
+        }
+
+
 
 class Book(db.Model):
 
@@ -267,6 +265,15 @@ class Book(db.Model):
 
         return '<Book {}>'.format(self.title)
 
+    def to_dict(self):
+
+        return {
+            "id": self.id,
+            "title": self.title,
+            "genres": self.genres,
+        }
+
+
 class BookTag(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -275,8 +282,17 @@ class BookTag(db.Model):
     count = db.Column(db.Integer)
 
     def __repr__(self):
+
         return '<BookTag {} {} {}>'.format(self.book_id, self.tag_id, self.count)
 
+    def to_dict(self):
+
+        return {
+            "id": self.id,
+            "book_id": self.book_id,
+            "tag_id": self.tag_id,
+            "count": self.count
+        }
 
 class Tag(db.Model):
 
@@ -286,4 +302,11 @@ class Tag(db.Model):
     def __repr__(self):
 
         return '<Book {}>'.format(self.name)
+
+    def to_dict(self):
+
+        return {
+            "id": self.id,
+            "name": self.name
+        }
 
