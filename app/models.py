@@ -170,14 +170,12 @@ class User(UserMixin, db.Model):
 
     def to_dict(self):
 
-        data = {
+        return {
             'id': self.id,
             'username': self.username,
             'email': self.email,
             'password_hash': self.password_hash
         }
-
-        return data
 
     def from_dict(self, data, new_user=False):
 

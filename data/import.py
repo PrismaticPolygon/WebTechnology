@@ -5,6 +5,8 @@ from app.models import Book, BookTag, Rating, Tag, User
 import csv
 import pandas as pd
 
+# That ID column is causing me issues. I'll have breakfast.
+
 NUMBER_OF_BOOKS = 10000
 NUMBER_OF_USERS = 100
 TAG_MAP = dict()    # Holds a map: old tag_id to new tag_id.
@@ -28,11 +30,24 @@ def write(file_name, data):
     Write a db.Model object with a to_dict function to a CSV
     """
 
-    with open(file_name, "w") as file:
+    print(data[0].to_dict())
 
-        writer = csv.DictWriter(file, fieldnames=data[0].keys())
+    # id is None. Of course.
+
+    keys = list(data[0].to_dict().keys())
+
+    with open(file_name, "w", newline="") as file:
+
+        writer = csv.DictWriter(file, fieldnames=keys)
+
+        writer.writerow(keys)
 
         for item in data:
+
+            item = item.to_dict()
+            item["id"] = item.username.split("_")[0]
+
+            print(item)
 
             writer.writerow(item.to_dict())
 
@@ -198,9 +213,9 @@ if __name__ == "__main__":
 
             data = import_function()
 
-            s.bulk_save_objects(data)
-
-            s.commit()
+            # s.bulk_save_objects(data)
+            #
+            # s.commit()
 
         except Exception as e:
 
