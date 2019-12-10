@@ -106,7 +106,7 @@ class User(UserMixin, db.Model):
 
         print(ratings)
 
-        return list(sorted(map(lambda x: {"title": x[1], "rating": x[0].value, "genres": x[2]}, ratings),
+        return list(sorted(map(lambda x: {"title": x[1], "rating": x[0].value, "genres": x[2].replace("|", ", ")}, ratings),
                            key=lambda x: x["rating"], reverse=True))
 
     def get_recommendations(self):
@@ -120,7 +120,11 @@ class User(UserMixin, db.Model):
 
         mlb = MultiLabelBinarizer()
 
-        books = books.join(pd.DataFrame(mlb.fit_transform(books.pop("genres")), columns=mlb.classes_,index=books.index))
+        books_with_genres = books.join(pd.DataFrame(mlb.fit_transform(books.pop("genres")), columns=mlb.classes_,index=books.index))
+
+        # print(books_with_genres)
+
+        books_with_genres = books_with_genres.drop("title", axis=1)
 
         ratings = pd.DataFrame([rating.to_dict() for rating in self.ratings.all()])
 
@@ -129,23 +133,33 @@ class User(UserMixin, db.Model):
         ratings = ratings.set_index("book_id")
         ratings = ratings.sort_index()
 
-        merged = pd.merge(books, ratings, on="book_id")
+        merged = pd.merge(books_with_genres, ratings, on="book_id")
 
-        user_genres = merged.drop(["title", "rating"], axis=1)
+        user_genres = merged.drop("rating", axis=1)
         user_ratings = ratings
 
         profile = user_genres.T.dot(user_ratings.rating)
-        books_with_genres = books.drop("title", axis=1)
 
         recommendations = (books_with_genres.dot(profile)) / profile.sum()
         recommendations = recommendations.sort_values(ascending=False)
         recommendations = recommendations.rename("recommendation", axis=1)
 
-        data = pd.merge(books, recommendations, left_index=True, right_index=True)["title"]
+        # Weird. I'm not sure where it comes from
+        # Perhaps
+
+        data = pd.merge(books, recommendations, on="book_id")
+        #
+        # print(data)
 
         data.drop(user_ratings.index, inplace=True)  # Remove books already rated by the user.
 
-        return list(data[:10])
+        actual = data.to_dict("records")[:10]
+
+        # for item in actual:
+        #
+        #     item["genres"] = item["genres"].replace("|", ", ")
+
+        return actual
 
     def set_password(self, password):
 
