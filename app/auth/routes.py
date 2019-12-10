@@ -32,7 +32,9 @@ def login():
 
         if not next_page or url_parse(next_page).netloc != '':
 
-            next_page = url_for('main.index')
+            next_page = url_for('main.user')
+
+        print("Next page", next_page)
 
         return redirect(next_page)
 

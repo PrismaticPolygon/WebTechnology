@@ -2,14 +2,19 @@ import base64
 from datetime import datetime, timedelta
 from hashlib import md5
 import os
-from time import time
-from flask import current_app, url_for
+import pandas as pd
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
+from sklearn.preprocessing import MultiLabelBinarizer
 
+GENRES = ['action', 'adventure', 'art', 'autobiography', 'anthology', 'biography', "childrens", 'cookbook',
+          'comic', 'diary', 'dictionary', 'crime', 'encyclopedia', 'drama', 'guide', 'fairytale', 'health',
+          'fantasy', 'history', 'graphic', 'journal', 'historical', 'math', 'horror', 'memoir', 'mystery', 'prayer',
+          'paranormal', 'religion', 'picture', 'textbook', 'poetry', 'review', 'political', 'crime', 'science',
+          'romance', 'satire', 'travel', 'scifi', 'short', 'suspense', 'thriller', 'ya', 'modern', 'classic',
+          'detective', 'war', 'period']
 
 class SearchableMixin(object):
 
@@ -97,42 +102,50 @@ class User(UserMixin, db.Model):
 
     def get_ratings(self):
 
-        ratings = self.ratings.join(Book).add_columns(Book.title).all()
+        ratings = self.ratings.join(Book).add_columns(Book.title, Book.genres).all()
 
-        return list(map(lambda x: {"title": x[1], "rating": x[0].value}, ratings))
+        print(ratings)
+
+        return list(sorted(map(lambda x: {"title": x[1], "rating": x[0].value, "genres": x[2]}, ratings),
+                           key=lambda x: x["rating"], reverse=True))
 
     def get_recommendations(self):
 
-        # So the first one is my writing, right?
-        # Yeah. Let's pre-generate it.
+        books = pd.DataFrame([book.to_dict() for book in Book.query.all()])
 
-        """
+        books = books.rename({"id": "book_id"}, axis=1)
+        books = books.set_index("book_id")
 
-        SELECT t2.movie
-        FROM movies t1 INNER JOIN movies t2
-             ON t1.user = 1
-             AND t2.user IN(2,3,4,5,6,7)
-             AND t2.movie NOT IN ( SELECT movie
-                                   FROM movies
-                                   WHERE user = 1 )
-        GROUP BY(t2.movie)
-        HAVING AVG(t2.rating)>=3
-        AND  COUNT(DISTINCT t2.user) >= 3
+        books["genres"] = books.genres.str.split("|")
 
-        """
+        mlb = MultiLabelBinarizer()
 
-        recommendations = Book.join(Book, )
+        books = books.join(pd.DataFrame(mlb.fit_transform(books.pop("genres")), columns=mlb.classes_,index=books.index))
 
-        # Lol. Far better to create this table ahead of time.
-        # Cause it's going to be HUGE.
+        ratings = pd.DataFrame([rating.to_dict() for rating in self.ratings.all()])
 
-        # Of course, it's not quite that simple.
-        # So let's get everything ship-shape here first.
+        ratings = ratings.rename({"value": "rating"}, axis=1)
+        ratings = ratings.drop(["id", "user_id"], axis=1)
+        ratings = ratings.set_index("book_id")
+        ratings = ratings.sort_index()
 
-        ratings = self.ratings.query(Book)
+        merged = pd.merge(books, ratings, on="book_id")
 
+        user_genres = merged.drop(["title", "rating"], axis=1)
+        user_ratings = ratings
 
+        profile = user_genres.T.dot(user_ratings.rating)
+        books_with_genres = books.drop("title", axis=1)
 
+        recommendations = (books_with_genres.dot(profile)) / profile.sum()
+        recommendations = recommendations.sort_values(ascending=False)
+        recommendations = recommendations.rename("recommendation", axis=1)
+
+        data = pd.merge(books, recommendations, left_index=True, right_index=True)["title"]
+
+        data.drop(user_ratings.index, inplace=True)  # Remove books already rated by the user.
+
+        return list(data[:10])
 
     def set_password(self, password):
 

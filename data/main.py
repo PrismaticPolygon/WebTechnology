@@ -53,6 +53,8 @@ def get_user_recommendations(user_id):
 
     # Matrices are not aligned.
 
+    # So we create a dataframe of all ratings that the user has reviewed.
+
     user_genres.set_index("book_id", inplace=True)
 
     print(user_ratings)
