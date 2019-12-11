@@ -104,8 +104,6 @@ class User(UserMixin, db.Model):
 
         ratings = self.ratings.join(Book).add_columns(Book.title, Book.genres).all()
 
-        print(ratings)
-
         return list(sorted(map(lambda x: {"title": x[1], "rating": x[0].value, "genres": x[2].replace("|", ", ")}, ratings),
                            key=lambda x: x["rating"], reverse=True))
 

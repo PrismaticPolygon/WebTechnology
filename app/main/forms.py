@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField
-from wtforms.validators import ValidationError, DataRequired, Length
+from wtforms import StringField, SubmitField, TextAreaField, IntegerField
+from wtforms.validators import ValidationError, DataRequired, Length, NumberRange
 from flask_babel import _, lazy_gettext as _l
-from app.models import User
+from app.models import User, Book
 
 
 class EditProfileForm(FlaskForm):
@@ -28,7 +28,29 @@ class EditProfileForm(FlaskForm):
                 raise ValidationError(_('That username is already taken. Please use another.'))
 
 
-class PostForm(FlaskForm):
+class RateBookForm(FlaskForm):
 
-    post = TextAreaField(_l('Say something'), validators=[DataRequired()])
-    submit = SubmitField(_l('Submit'))
+    title = StringField(_l("Title"), validators=[DataRequired()])
+    rating = IntegerField(_l("Please enter a rating"), validators=[DataRequired(), NumberRange(0, 5)])
+    submit = SubmitField(_l('Rate'))
+
+    def get_book_id(self):
+
+        return self.book_id
+
+    def validate_title(self, title):
+
+        title = title.data.lower().strip()
+
+        books = [str(book.title).lower().strip() for book in Book.query.all() if book.title is not None]
+
+        i = books.index(title)
+
+        if i == -1:
+
+            raise ValidationError(_("That book is not in the database."))
+
+        self.book_id = i + 1
+
+
+

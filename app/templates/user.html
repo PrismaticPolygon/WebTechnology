@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
 
@@ -30,36 +31,37 @@
 
     </table>
 
-    <h2> Recommendations </h2>
+    <div class="row">
 
-    <table class="table">
+        <div class="col-md-6">
 
-        <tr>
+            <h2> Rate a book</h2>
 
-            <th>Title</th>
+            {{ wtf.quick_form(form) }}
 
-{#            <th>Genres</th>#}
+        </div>
 
-        </tr>
+        <div class="col-md-6">
 
-        {% for recommendation in recommendations %}
+            <h2> Top 10 recommendations </h2>
 
-            <tr>
+            <ol>
 
-                <td>
-                    {{ recommendation.title }}
-                </td>
+                {% for recommendation in recommendations %}
 
-{##}
-{#                 <td>#}
-{#                    {{ recommendation.genres }}#}
-{#                </td>#}
+                    <li>
 
-            </tr>
+                         {{ recommendation.title }}
 
-        {% endfor %}
+                    </li>
 
-    </table>
+                {% endfor %}
+
+            </ol>
+
+        </div>
+
+    </div>
 
     <h2> Ratings </h2>
 

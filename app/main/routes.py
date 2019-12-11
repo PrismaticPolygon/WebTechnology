@@ -3,8 +3,8 @@ from flask import render_template, flash, redirect, url_for, request, g, jsonify
 from flask_login import current_user, login_required
 from flask_babel import _, get_locale
 from app import db
-from app.main.forms import EditProfileForm
-from app.models import User, Book
+from app.main.forms import EditProfileForm, RateBookForm
+from app.models import User, Book, Rating
 from app.translate import translate
 from app.main import bp
 
@@ -28,16 +28,46 @@ def index():
     return render_template('index.html', title=_('Home'), books=books)
 
 
-@bp.route('/user/<username>')
+@bp.route('/user/<username>', methods=["GET", "POST"])
 @login_required
 def user(username):
 
     user = User.query.filter_by(username=username).first_or_404()
+    form = RateBookForm()
+
+    if request.method == "POST":
+
+        if form.validate_on_submit():   # I.e. it passes. Then we change or update the correct rating.
+
+            user_id = current_user.id
+            book_id = form.get_book_id()
+
+            rating = Rating.query.filter_by(book_id=book_id, user_id=user_id).first()
+
+            if rating is None:
+
+                rating = Rating(book_id=book_id, user_id=user_id, value=form.rating.data)
+
+            else:
+
+                rating.value = form.rating.data
+
+            db.session.add(rating)
+
+            db.session.commit()
+
+            # Wait. I need to book_id, right? Is there anyway to get it.
+
+            print(user_id, book_id)
 
     ratings = user.get_ratings()
     recommendations = user.get_recommendations()
 
-    return render_template('user.html', user=user, ratings=ratings, recommendations=recommendations)
+    return render_template('user.html',
+                           user=user,
+                           ratings=ratings,
+                           recommendations=recommendations,
+                           form=form)
 
 
 @bp.route('/edit_profile', methods=['GET', 'POST'])
