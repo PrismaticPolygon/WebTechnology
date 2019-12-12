@@ -19,8 +19,6 @@ GENRES = ['Action', 'Adult', 'Adult Fiction', 'Adventure', 'Animals', 'Biography
           'Memoir', 'Music', 'Mystery', 'Mythology', 'Nonfiction', 'Parenting', 'Picture Books', 'Poetry', 'Politics',
           'Romance', 'Science', 'Science Fiction', 'Self Help', 'Thriller', 'War', 'Young Adult']
 
-# What! Where
-
 books_df = pd.read_csv("data/books.csv", index_col="id")
 
 def generate_users():
@@ -64,15 +62,6 @@ def generate_ratings():
             rating = Rating(book_id=book_id, user_id=user_id, value=value)
 
             ratings.append(rating)
-
-    # with open("data/ratings.csv", "w", newline="") as ratings_file:
-    #
-    #     writer = csv.DictWriter(ratings_file, fieldnames=["id", "book_id", "user_id", "value"])
-    #     writer.writeheader()
-    #
-    #     for rating in ratings:
-    #
-    #         writer.writerow(rating.to_dict())
 
     return ratings
 
