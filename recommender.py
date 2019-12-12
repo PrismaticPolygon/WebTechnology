@@ -66,6 +66,7 @@ recommendations = (books[~books['book_id'].isin(user_full['book_id'])].
 # All fairly dull values.
 # I'll expand my genre preference scheme, I think.
 # But the important thing: it works!
+# There we go! That's a bit cooler.
 
 print(preds_df.head())
 

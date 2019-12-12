@@ -5,6 +5,7 @@ from app.models import User, Rating, Book
 import csv
 import pandas as pd
 import random
+import numpy as np
 
 NUMBER_OF_USERS = 10
 books = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/books.csv", index_col="book_id")
@@ -22,6 +23,8 @@ for genres in books["genres"]:
 
             GENRES.append(genre)
 
+NUMBER_OF_GENRES = len(GENRES)
+
 def generate_users():
 
     users = list()
@@ -35,41 +38,36 @@ def generate_users():
 
     return users
 
+def round_rating(number):
+
+    return round(number * 2) / 2
+
 def generate_ratings():
 
     ratings = list()
     book_ids = range(1, NUMBER_OF_BOOKS)
 
+    # So we basically wanted a weighted score of each genre. Then we sum them up.
+
     for user_id in range(1, NUMBER_OF_USERS):
 
-        best_genre = random.choice(GENRES)
-
-        while 1:
-
-            worst_genre = random.choice(GENRES)
-
-            if worst_genre != best_genre:
-
-                break
+        user_preferences = np.random.rand(NUMBER_OF_GENRES)
 
         for book_id in random.choices(book_ids, k=NUMBER_OF_RATINGS):
 
             book_genres = books.iloc[book_id].genres.split("|")
 
-            value = random.choice([2, 3])
+            value = 0
 
-            if best_genre in book_genres:
+            for genre in book_genres:
 
-                value = random.choice([4, 5])
+                value += user_preferences[GENRES.index(genre)]
 
-            if worst_genre in book_genres:
-
-                value = max(1, value - random.choice([2, 3]))
+            value = round_rating((5 * value) / len(book_genres))
 
             rating = Rating(book_id=book_id, user_id=user_id, value=value)
 
             ratings.append(rating)
-
 
     with open("ratings.csv", "w", newline="") as ratings_file:
 
