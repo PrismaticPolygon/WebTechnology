@@ -80,10 +80,6 @@ def get_locale():
     :return: A language code defined in config.py
     """
 
-    locale = request.accept_languages.best_match(current_app.config['LANGUAGES'])
-
-    print("Getting locale:", locale)
-
     return request.accept_languages.best_match(current_app.config['LANGUAGES'])
 
 

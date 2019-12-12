@@ -1,0 +1,172 @@
+# German translations for PROJECT.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-12-12 18:53+0000\n"
+"PO-Revision-Date: 2019-12-12 18:34+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: app/__init__.py:17
+msgid "Please log in to access this page."
+msgstr "Bitte melden Sie sich an, um auf diese Seite zuzugreifen."
+
+#: app/auth/forms.py:10 app/auth/forms.py:17
+msgid "Username"
+msgstr "Nutzername"
+
+#: app/auth/forms.py:11 app/auth/forms.py:19
+msgid "Password"
+msgstr "Passwort"
+
+#: app/auth/forms.py:12
+msgid "Remember Me"
+msgstr "Behalte mich in Erinnerung"
+
+#: app/auth/forms.py:13 app/auth/routes.py:37 app/templates/auth/login.html:6
+msgid "Sign In"
+msgstr "Anmelden"
+
+#: app/auth/forms.py:18
+msgid "Email"
+msgstr "Email"
+
+#: app/auth/forms.py:20
+msgid "Repeat Password"
+msgstr "Wiederhole das Passwort"
+
+#: app/auth/forms.py:21 app/auth/routes.py:67
+#: app/templates/auth/register.html:6
+msgid "Register"
+msgstr "Registrieren"
+
+#: app/auth/forms.py:29
+msgid "That username is already taken. Please use another."
+msgstr ""
+"Dieser Benutzername ist bereits vergeben. Bitte verwenden Sie einen "
+"anderen."
+
+#: app/auth/forms.py:37
+msgid "That email address is already taken. Please use another."
+msgstr ""
+"Diese E-Mail-Adresse ist bereits vergeben. Bitte verwenden Sie einen "
+"anderen."
+
+#: app/main/forms.py:9
+msgid "Title or ID"
+msgstr "Titel oder ID"
+
+#: app/main/forms.py:10
+msgid "Please enter a rating"
+msgstr "Bitte geben Sie eine Bewertung ein"
+
+#: app/main/forms.py:11
+msgid "Rate"
+msgstr "Bewertung"
+
+#: app/main/forms.py:29
+msgid "That book is not in the database."
+msgstr "Das Buch ist nicht in der Datenbank."
+
+#: app/main/routes.py:27 app/templates/base.html:31
+msgid "Home"
+msgstr "Zuhause"
+
+#: app/templates/base.html:5
+msgid "Welcome to Bookler"
+msgstr "Willkommen bei Bookler"
+
+#: app/templates/base.html:38
+msgid "Login"
+msgstr "Einloggen"
+
+#: app/templates/base.html:42
+msgid "Profile"
+msgstr "Profil"
+
+#: app/templates/base.html:43
+msgid "Logout"
+msgstr "Ausloggen"
+
+#: app/templates/index.html:6
+msgid "Books"
+msgstr "Bücher"
+
+#: app/templates/index.html:12 app/templates/user.html:56
+#: app/templates/user.html:111
+msgid "ID"
+msgstr "ID"
+
+#: app/templates/index.html:14 app/templates/user.html:58
+#: app/templates/user.html:113
+msgid "Title"
+msgstr "Titel"
+
+#: app/templates/index.html:16 app/templates/user.html:62
+#: app/templates/user.html:117
+msgid "Genres"
+msgstr "Genres"
+
+#: app/templates/user.html:18
+msgid "Last seen on"
+msgstr "Zuletzt gesehen am"
+
+#: app/templates/user.html:34
+msgid "Rate a book"
+msgstr "Buch bewerten"
+
+#: app/templates/user.html:44
+msgid "Recommendations (random)"
+msgstr "Empfehlungen (zufällig)"
+
+#: app/templates/user.html:48
+msgid "Recommendations"
+msgstr "Empfehlungen"
+
+#: app/templates/user.html:60
+msgid "Value"
+msgstr "Wert"
+
+#: app/templates/user.html:101
+msgid "Rate a book to start receiving personalised recommendations!"
+msgstr "Bewerte ein Buch, um personalisierte Empfehlungen zu erhalten!"
+
+#: app/templates/user.html:115
+msgid "Rating"
+msgstr "Bewertung"
+
+#: app/templates/auth/login.html:20
+msgid "New User?"
+msgstr "Neuer Benutzer?"
+
+#: app/templates/auth/login.html:20
+msgid "Click to Register!"
+msgstr "Klicken Sie hier, um sich zu registrieren!"
+
+#: app/templates/errors/404.html:4
+msgid "Not Found"
+msgstr "Nicht gefunden"
+
+#: app/templates/errors/404.html:5 app/templates/errors/500.html:6
+msgid "Back"
+msgstr "Zurück"
+
+#: app/templates/errors/500.html:4
+msgid "An unexpected error has occurred"
+msgstr "Ein unerwarteter Fehler ist aufgetreten"
+
+#: app/templates/errors/500.html:5
+msgid "The administrator has been notified. Sorry for the inconvenience!"
+msgstr "Der Administrator wurde benachrichtigt. Entschuldigen Sie die Unannehmlichkeiten!"
+
