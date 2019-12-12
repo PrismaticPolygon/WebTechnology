@@ -35,3 +35,7 @@ class RegistrationForm(FlaskForm):
         if user is not None:
 
             raise ValidationError(_('That email address is already taken. Please use another.'))
+
+class DeleteUserForm(FlaskForm):
+
+    submit = SubmitField(_l('Delete user'))

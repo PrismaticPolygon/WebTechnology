@@ -49,11 +49,11 @@ class User(UserMixin, db.Model):
         print("RATINGS\n")
         print(ratings_df)
 
-        R_df = ratings_df.pivot(index="user_id", columns="book_id", values="value").fillna(0)
+        R_df = ratings_df.pivot(index="user_id", columns="book_id", values="value")
 
-        R = R_df.values
-        user_ratings_mean = np.mean(R, axis=1)
-        R_demeaned = R - user_ratings_mean.reshape(-1, 1)
+        user_ratings_mean = np.array(R_df.mean(axis=1))
+
+        R_demeaned = R_df.sub(R_df.mean(axis=1), axis=0).fillna(0).values
 
         k = min(R_demeaned.shape[0] - 1, 25)
 

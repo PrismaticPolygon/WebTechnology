@@ -1,68 +1,37 @@
-Heavily based on [this](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) tutorial.
+# Web Technology
 
-### Data
+This coursework is based on [this](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) 
+tutorial. It is hosted on [Heroku](https://ffgt86-web-technology.herokuapp.com/).
 
-The dataset is from Goodreads, a social book cataloguing site. It comprises 6 million ratings for 
-the then thousand most popular books, along with book metadata. It can be found [here](https://github.com/zygmuntz/goodbooks-10k).
+### Users
 
-It contains four tables of interest:
-1. `ratings.csv` comprises `user_id`, `book_id`, and `rating` (between 1 and 5). Both `user_id` and `book_id` are
-contiguous (between 1 - 53424 for users, and 1 - 10000 for books).
-2. `books.csv` has metadata for each book, such as `goodread_book_id`, `authors`, `title`, `isbn`, and so on.
-3. `book_tags.csv` contains tags / shelves / genres assigned by users to books, represented by their `tag_id`.
-4. `tags.csv` comprises `tag_id`, and `tag_name`. 
+There are `n=50` users in the system; this can be programmatically set in `generate.py`. Each user has a username of the
+ form `user_i`, where `i` is in the range `[1, n]`.
+Each password follows the same format, i.e.`password_i`. Passwords are hashed using MD5.
+User tokens are stored in cookies; sessions persist.
+Users can be created by clicking `Register`. A unique id and email must be specified. Users can delete their profiles 
+on the profile page. URLs are appropriately guarded; an unauthenticated user will not be able to access the profile
+of a different user. 
 
-#### Pre-processing
+### Ratings
 
-It is specified in the assignment that the database should consist of two tables:
-1. UserID, BookID, Rating
-2. BookID, Title, Genres
+Ratings are quasi-randomly generated in `generate.py`. 
+Each user is given genre preferences, and between `10 - 50` ratings are calculated
+using these preferences as weights. Ratings can be created, updated, and deleted on the user page. 
+If a user has no ratings, a random sample of books is recommended.
 
-So a lot of fields can be removed.
+### Books
 
-Tags roughly correspond to genres in this dataset, though, as they are user-defined, plenty
-are useless, and so are removed in `parse.py`.
+Book data is taken from [Goodreads](https://www.goodreads.com/choiceawards/best-books-2019?int=gca_signed_out_hp),
+and was entered manually by hand. Considerable effort was expended using the dataset [here](https://github.com/zygmuntz/goodbooks-10k),
+but parsing tags proved too unreliable. There are `100` books in the database comprising `41` distinct genres. 
 
-### Recommended links
+### Recommendations
 
-* https://stackabuse.com/creating-a-simple-recommender-system-in-python-using-pandas/
-* https://beckernick.github.io/matrix-factorization-recommender/
-* https://www.makeuseof.com/tag/python-javascript-communicate-json/
+Recommendations are generated using the tutorial [here](https://beckernick.github.io/matrix-factorization-recommender/),
+with some tweaks. 
 
-### Notes
-* Rating should be dynamically updated as users make updates
-* Users should be able to log in, with tokens stored in cookies
-* Interaction is more important than layout
-* Best way to submit is to provide a URL to a working system
-* Only implement one recommender algorithm
-* Example [here](https://github.com/wyo9057/movie_recommender_system).
+### Localisation / i18n
 
-## Marks
-1. Incorporate a dataset of books ratings. The dataset should maintain two tables. One
-table comprises data of user ID, book ID, and book rating. Another table comprises
-data of book ID, book title and book genres. [15]
-2. Maintain user profile to store user preference of books. [15]
-3. Apply user profile to provide book recommendation based on a suitable
-recommendation algorithm. [50]
-4. Provide a suitable interface for a user to interact with the system, supporting user profile
-creation and/or update and receiving book recommendations
-
-## Languages
-
-These commands can be called using:
-`flask translate init LANG`
-`flask translate update`
-`flask translate compile`
-
-To extract all texts to the .pot file, use the following command: `pybabel extract -F babel.cfg -k _l -o messages.pot`.
-To add a new language, run `pybabel init -i messages.pot -d app/translations -l LANGUAGE_CODE`.
-To compile all the translations for the application, use `pybabel compile -d app/translations`
-
-## TODO
-
-- [ ] Update home page to show books
-- [ ] Import Goodreads data into database
-- [ ] Add German to available languages
-- [ ] Remove pagination
-- [ ] Update user page to show their rated books
-- [ ] Remove messaging
+The website is available in both English and German. Translation is handled by `Babel`. Translations could easily
+be extended to the books themselves or other languages. 

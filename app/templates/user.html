@@ -3,7 +3,7 @@
 
 {% block app_content %}
 
-    <table class="table table-hover" style="width:50%; border-collapse: collapse">
+    <table class="table table-hover" style="width:100%; border-collapse: collapse">
 
         <tr>
 
@@ -21,6 +21,8 @@
 
                 <p>ID: {{ user.id }}</p>
 
+                {{ wtf.quick_form(delete_user_form) }}
+
             </td>
 
         </tr>
@@ -31,11 +33,19 @@
 
         <div class="col-md-6">
 
-            <h2> {{ _("Rate a book") }}</h2>
+            <h2> {{ _("Create or update a rating") }}</h2>
 
-            {{ wtf.quick_form(form) }}
+            {{ wtf.quick_form(edit_form) }}
 
         </div>
+
+        <div class="col-md-6">
+
+                <h2> {{ _("Delete a rating") }}</h2>
+
+                {{ wtf.quick_form(delete_form) }}
+
+            </div>
 
     </div>
 

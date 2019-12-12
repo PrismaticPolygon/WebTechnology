@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-12-12 18:53+0000\n"
+"POT-Creation-Date: 2019-12-12 22:30+0000\n"
 "PO-Revision-Date: 2019-12-12 18:34+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -63,7 +63,11 @@ msgstr ""
 "Diese E-Mail-Adresse ist bereits vergeben. Bitte verwenden Sie einen "
 "anderen."
 
-#: app/main/forms.py:9
+#: app/auth/forms.py:41
+msgid "Delete user"
+msgstr ""
+
+#: app/main/forms.py:9 app/main/forms.py:37
 msgid "Title or ID"
 msgstr "Titel oder ID"
 
@@ -75,11 +79,19 @@ msgstr "Bitte geben Sie eine Bewertung ein"
 msgid "Rate"
 msgstr "Bewertung"
 
-#: app/main/forms.py:29
+#: app/main/forms.py:29 app/main/forms.py:56
 msgid "That book is not in the database."
 msgstr "Das Buch ist nicht in der Datenbank."
 
-#: app/main/routes.py:27 app/templates/base.html:31
+#: app/main/forms.py:38
+msgid "Delete"
+msgstr "Löschen"
+
+#: app/main/forms.py:62
+msgid "You have not rated this book."
+msgstr "Sie haben dieses Buch nicht bewertet."
+
+#: app/main/routes.py:28 app/templates/base.html:31
 msgid "Home"
 msgstr "Zuhause"
 
@@ -103,18 +115,18 @@ msgstr "Ausloggen"
 msgid "Books"
 msgstr "Bücher"
 
-#: app/templates/index.html:12 app/templates/user.html:56
-#: app/templates/user.html:111
+#: app/templates/index.html:12 app/templates/user.html:66
+#: app/templates/user.html:121
 msgid "ID"
 msgstr "ID"
 
-#: app/templates/index.html:14 app/templates/user.html:58
-#: app/templates/user.html:113
+#: app/templates/index.html:14 app/templates/user.html:68
+#: app/templates/user.html:123
 msgid "Title"
 msgstr "Titel"
 
-#: app/templates/index.html:16 app/templates/user.html:62
-#: app/templates/user.html:117
+#: app/templates/index.html:16 app/templates/user.html:72
+#: app/templates/user.html:127
 msgid "Genres"
 msgstr "Genres"
 
@@ -122,27 +134,35 @@ msgstr "Genres"
 msgid "Last seen on"
 msgstr "Zuletzt gesehen am"
 
-#: app/templates/user.html:34
-msgid "Rate a book"
-msgstr "Buch bewerten"
+#: app/templates/user.html:36
+msgid "Create or update a rating"
+msgstr "Erstellen oder aktualisieren Sie eine Bewertung"
 
 #: app/templates/user.html:44
+msgid "Delete a rating"
+msgstr "Bewertung löschen"
+
+#: app/templates/user.html:54
 msgid "Recommendations (random)"
 msgstr "Empfehlungen (zufällig)"
 
-#: app/templates/user.html:48
+#: app/templates/user.html:58
 msgid "Recommendations"
 msgstr "Empfehlungen"
 
-#: app/templates/user.html:60
+#: app/templates/user.html:70
 msgid "Value"
 msgstr "Wert"
 
-#: app/templates/user.html:101
+#: app/templates/user.html:111
 msgid "Rate a book to start receiving personalised recommendations!"
 msgstr "Bewerte ein Buch, um personalisierte Empfehlungen zu erhalten!"
 
 #: app/templates/user.html:115
+msgid "Ratings"
+msgstr "Bewertungen"
+
+#: app/templates/user.html:125
 msgid "Rating"
 msgstr "Bewertung"
 
@@ -168,5 +188,10 @@ msgstr "Ein unerwarteter Fehler ist aufgetreten"
 
 #: app/templates/errors/500.html:5
 msgid "The administrator has been notified. Sorry for the inconvenience!"
-msgstr "Der Administrator wurde benachrichtigt. Entschuldigen Sie die Unannehmlichkeiten!"
+msgstr ""
+"Der Administrator wurde benachrichtigt. Entschuldigen Sie die "
+"Unannehmlichkeiten!"
+
+#~ msgid "Rate a book"
+#~ msgstr "Buch bewerten"
 
