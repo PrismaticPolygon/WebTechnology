@@ -1,79 +1,16 @@
 import base64
 from datetime import datetime, timedelta
 from hashlib import md5
-import os
 import pandas as pd
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login
-from app.search import add_to_index, remove_from_index, query_index
-from sklearn.preprocessing import MultiLabelBinarizer
+from scipy.sparse.linalg import svds
+import numpy as np
 
-GENRES = ['action', 'adventure', 'art', 'autobiography', 'anthology', 'biography', "childrens", 'cookbook',
-          'comic', 'diary', 'dictionary', 'crime', 'encyclopedia', 'drama', 'guide', 'fairytale', 'health',
-          'fantasy', 'history', 'graphic', 'journal', 'historical', 'math', 'horror', 'memoir', 'mystery', 'prayer',
-          'paranormal', 'religion', 'picture', 'textbook', 'poetry', 'review', 'political', 'crime', 'science',
-          'romance', 'satire', 'travel', 'scifi', 'short', 'suspense', 'thriller', 'ya', 'modern', 'classic',
-          'detective', 'war', 'period']
+def round_rating(number):
 
-class SearchableMixin(object):
-
-    @classmethod
-    def search(cls, expression, page, per_page):
-
-        ids, total = query_index(cls.__tablename__, expression, page, per_page)
-
-        if total == 0:
-
-            return cls.query.filter_by(id=0), 0
-
-        when = []
-
-        for i in range(len(ids)):
-
-            when.append((ids[i], i))
-
-        return cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id)), total
-
-    @classmethod
-    def before_commit(cls, session):
-
-        session._changes = {
-            'add': list(session.new),
-            'update': list(session.dirty),
-            'delete': list(session.deleted)
-        }
-
-    @classmethod
-    def after_commit(cls, session):
-
-        for obj in session._changes['add']:
-
-            if isinstance(obj, SearchableMixin):
-
-                add_to_index(obj.__tablename__, obj)
-
-        for obj in session._changes['update']:
-
-            if isinstance(obj, SearchableMixin):
-
-                add_to_index(obj.__tablename__, obj)
-
-        for obj in session._changes['delete']:
-
-            if isinstance(obj, SearchableMixin):
-
-                remove_from_index(obj.__tablename__, obj)
-
-        session._changes = None
-
-    @classmethod
-    def reindex(cls):
-
-        for obj in cls.query:
-
-            add_to_index(cls.__tablename__, obj)
-
+    return round(number * 2) / 2
 
 class User(UserMixin, db.Model):
 
@@ -86,7 +23,7 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
 
-        return '<User {}>'.format(self.username)
+        return '{}'.format(self.username)
 
     def get_ratings(self):
 
@@ -95,50 +32,64 @@ class User(UserMixin, db.Model):
         return list(sorted(map(lambda x: {"title": x[1], "rating": x[0].value, "genres": x[2].replace("|", ", ")}, ratings),
                            key=lambda x: x["rating"], reverse=True))
 
-    def get_recommendations(self):
 
+    def get_recommendations(self, num_recommendations=10):
+
+        # Convert Book to a DataFrame
         books = pd.DataFrame([book.to_dict() for book in Book.query.all()])
-
         books = books.rename({"id": "book_id"}, axis=1)
-        books = books.set_index("book_id")
 
-        books["genres"] = books.genres.str.split("|")
+        # Convert Rating to a DataFrame
+        ratings = pd.DataFrame([rating.to_dict() for rating in Rating.query.all()])
+        ratings = ratings.drop("id", axis=1)
 
-        mlb = MultiLabelBinarizer()
+        R_df = ratings.pivot_table(index="user_id", columns="book_id", values="value").fillna(0)
 
-        books_with_genres = books.join(pd.DataFrame(mlb.fit_transform(books.pop("genres")), columns=mlb.classes_,index=books.index))
+        # Normalise by each user's mean.
+        R = R_df.values
+        user_ratings_mean = np.mean(R, axis=1)
+        R_demeaned = R - user_ratings_mean.reshape(-1, 1)
 
-        books_with_genres = books_with_genres.drop("title", axis=1)
+        # 50 is best. So we'll have 50 users in the final iteration!
 
-        ratings = pd.DataFrame([rating.to_dict() for rating in self.ratings.all()])
+        U, sigma, Vt = svds(R_demeaned, k=5)
+        sigma = np.diag(sigma)
 
-        if not ratings.empty:
+        predictions = np.dot(np.dot(U, sigma), Vt) + user_ratings_mean.reshape(-1, 1)
+        predictions_df = pd.DataFrame(predictions, columns=R_df.columns)
 
-            ratings = ratings.rename({"value": "rating"}, axis=1)
-            ratings = ratings.drop(["id", "user_id"], axis=1)
-            ratings = ratings.set_index("book_id")
-            ratings = ratings.sort_index()
+        user_predictions = pd.DataFrame(predictions_df.iloc[self.id].sort_values(ascending=False)).reset_index()
+        user_predictions.columns = ["book_id", "value"]
 
-            merged = pd.merge(books_with_genres, ratings, on="book_id")
+        print("USER PREDICTIONS\n")
+        print(user_predictions)
 
-            user_genres = merged.drop("rating", axis=1)
-            user_ratings = ratings
+        user_ratings = ratings[ratings.user_id == self.id]
+        user_full = user_ratings.merge(books, how='left', on='book_id').sort_values('value', ascending=False)
 
-            profile = user_genres.T.dot(user_ratings.rating)
+        # Remove books that the user has already rated
+        books = books[~books['book_id'].isin(user_full['book_id'])]
 
-            recommendations = (books_with_genres.dot(profile)) / profile.sum()
-            recommendations = recommendations.sort_values(ascending=False)
-            recommendations = recommendations.rename("recommendation", axis=1)
+        # That is indeed the case.
 
-            data = pd.merge(books, recommendations, on="book_id")
+        print("BOOKS\n")
+        print(books)
 
-            data.drop(user_ratings.index, inplace=True)  # Remove books already rated by the user.
+        # Presumably, NAN is what we've already rated.
 
-            actual = data.to_dict("records")[:10]
+        recommendations = books.merge(user_predictions, how='left', on='book_id').sort_values('value', ascending=False)
+        recommendations = recommendations[~recommendations["value"].isna()].iloc[:num_recommendations]
 
-            return actual
+        print(recommendations["value"].isna().sum())
 
-        return books[:10].to_dict("records")
+        recommendations["genres"] = recommendations["genres"].str.replace("|", ", ")
+        recommendations["value"] = recommendations["value"].map(round_rating)
+
+        print("RECOMMENDATIONS\n")
+        print(recommendations)
+        # print(list(recommendations))
+
+        return recommendations.to_dict("records")
 
     def set_password(self, password):
 
@@ -185,7 +136,6 @@ class User(UserMixin, db.Model):
 
         return user
 
-
 @login.user_loader
 def load_user(id):
 
@@ -200,7 +150,16 @@ class Rating(db.Model):
 
     def __repr__(self):
 
-        return '<Rating {} {} {}>'.format(self.user_id, self.book_id, self.value)
+        return '{} rated {} {} stars'.format(self.user_id, self.book_id, self.value)
+
+    def to_dict(self):
+
+        return {
+            "id": self.id,
+            "book_id": self.book_id,
+            "user_id": self.user_id,
+            "value": self.value
+        }
 
 class Book(db.Model):
 
@@ -210,4 +169,12 @@ class Book(db.Model):
 
     def __repr__(self):
 
-        return '<Book {}>'.format(self.title)
+        return '{} ({})'.format(self.title, ", ".join(self.genres.split("|")))
+
+    def to_dict(self):
+
+        return {
+            "id": self.id,
+            "title": self.title,
+            "genres": self.genres,
+        }

@@ -1,5 +1,3 @@
-from app import db
-from app.models import Book, User
 import numpy as np
 import pandas as pd
 from scipy.sparse.linalg import svds
@@ -9,8 +7,6 @@ ratings = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/ratings.csv")
 
 print(books.head())
 print(ratings.head())
-
-print(np.where(ratings.index.duplicated())) # It's empty!
 
 ratings.reset_index(inplace=True)
 

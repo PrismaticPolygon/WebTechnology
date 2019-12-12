@@ -41,27 +41,48 @@
 
         </div>
 
-        <div class="col-md-6">
-
-            <h2> Top 10 recommendations </h2>
-
-            <ol>
-
-                {% for recommendation in recommendations %}
-
-                    <li>
-
-                         {{ recommendation.title }}
-
-                    </li>
-
-                {% endfor %}
-
-            </ol>
-
-        </div>
-
     </div>
+
+    <h2> Recommendations </h2>
+
+    <table class="table">
+
+        <tr>
+
+            <th>Title</th>
+
+            <th>Predicted rating</th>
+
+            <th>Genres</th>
+
+        </tr>
+
+        {% for recommendation in recommendations %}
+
+            <tr>
+
+                <td>
+                    {{ recommendation.title }}
+                </td>
+
+                 <td>
+
+                    {{ recommendation.value }}
+
+                </td>
+
+                <td>
+
+                    {{ recommendation.genres }}
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+    </table>
+
 
     <h2> Ratings </h2>
 
@@ -85,13 +106,15 @@
                     {{ rating.title }}
                 </td>
 
-                 <td>
+                <td>
+
                     {{ rating.rating }}
+
                 </td>
 
                 <td>
 
-                    {{ rating.genres.split("|") }}
+                    {{ rating.genres }}
 
                 </td>
 
