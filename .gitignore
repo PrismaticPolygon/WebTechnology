@@ -43,4 +43,3 @@ nosetests.xml
 venv
 app.db
 Bookler.log*
-migrations

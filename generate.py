@@ -2,10 +2,10 @@ from time import time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.models import User, Rating, Book
-import csv
 import pandas as pd
 import random
 import numpy as np
+from config import Config
 
 NUMBER_OF_USERS = 50
 NUMBER_OF_BOOKS = 100
@@ -79,10 +79,13 @@ def generate_books():
 
 if __name__ == "__main__":
 
+    config = Config()
     t = time()
 
+    print(config.SQLALCHEMY_DATABASE_URI)
+
     # Create the database
-    engine = create_engine('sqlite:///app.db')
+    engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
 
     generators = [
         generate_users,
