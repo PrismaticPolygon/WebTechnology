@@ -32,7 +32,7 @@ def login():
 
         if not next_page or url_parse(next_page).netloc != '':
 
-            next_page = url_for('main.user')
+            next_page = url_for('main.user', username=form.username.data)
 
         print("Next page", next_page)
 

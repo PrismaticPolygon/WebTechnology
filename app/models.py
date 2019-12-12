@@ -84,18 +84,6 @@ class User(UserMixin, db.Model):
 
     ratings = db.relationship("Rating", backref="rater", lazy="dynamic")
 
-    # posts = db.relationship('Post', backref='author', lazy='dynamic')
-    # about_me = db.Column(db.String(140))
-    # last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    # token = db.Column(db.String(32), index=True, unique=True)
-    # token_expiration = db.Column(db.DateTime)
-    #
-    # followed = db.relationship(
-    #     'User', secondary=followers,
-    #     primaryjoin=(followers.c.follower_id == id),
-    #     secondaryjoin=(followers.c.followed_id == id),
-    #     backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
-
     def __repr__(self):
 
         return '<User {}>'.format(self.username)
@@ -120,44 +108,37 @@ class User(UserMixin, db.Model):
 
         books_with_genres = books.join(pd.DataFrame(mlb.fit_transform(books.pop("genres")), columns=mlb.classes_,index=books.index))
 
-        # print(books_with_genres)
-
         books_with_genres = books_with_genres.drop("title", axis=1)
 
         ratings = pd.DataFrame([rating.to_dict() for rating in self.ratings.all()])
 
-        ratings = ratings.rename({"value": "rating"}, axis=1)
-        ratings = ratings.drop(["id", "user_id"], axis=1)
-        ratings = ratings.set_index("book_id")
-        ratings = ratings.sort_index()
+        if not ratings.empty:
 
-        merged = pd.merge(books_with_genres, ratings, on="book_id")
+            ratings = ratings.rename({"value": "rating"}, axis=1)
+            ratings = ratings.drop(["id", "user_id"], axis=1)
+            ratings = ratings.set_index("book_id")
+            ratings = ratings.sort_index()
 
-        user_genres = merged.drop("rating", axis=1)
-        user_ratings = ratings
+            merged = pd.merge(books_with_genres, ratings, on="book_id")
 
-        profile = user_genres.T.dot(user_ratings.rating)
+            user_genres = merged.drop("rating", axis=1)
+            user_ratings = ratings
 
-        recommendations = (books_with_genres.dot(profile)) / profile.sum()
-        recommendations = recommendations.sort_values(ascending=False)
-        recommendations = recommendations.rename("recommendation", axis=1)
+            profile = user_genres.T.dot(user_ratings.rating)
 
-        # Weird. I'm not sure where it comes from
-        # Perhaps
+            recommendations = (books_with_genres.dot(profile)) / profile.sum()
+            recommendations = recommendations.sort_values(ascending=False)
+            recommendations = recommendations.rename("recommendation", axis=1)
 
-        data = pd.merge(books, recommendations, on="book_id")
-        #
-        # print(data)
+            data = pd.merge(books, recommendations, on="book_id")
 
-        data.drop(user_ratings.index, inplace=True)  # Remove books already rated by the user.
+            data.drop(user_ratings.index, inplace=True)  # Remove books already rated by the user.
 
-        actual = data.to_dict("records")[:10]
+            actual = data.to_dict("records")[:10]
 
-        # for item in actual:
-        #
-        #     item["genres"] = item["genres"].replace("|", ", ")
+            return actual
 
-        return actual
+        return books[:10].to_dict("records")
 
     def set_password(self, password):
 
@@ -172,27 +153,6 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
 
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
-
-    def to_dict(self):
-
-        return {
-            'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'password_hash': self.password_hash
-        }
-
-    def from_dict(self, data, new_user=False):
-
-        for field in ['username', 'email', 'about_me']:
-
-            if field in data:
-
-                setattr(self, field, data[field])
-
-        if new_user and 'password' in data:
-
-            self.set_password(data['password'])
 
     def get_token(self, expires_in=3600):
 
@@ -242,18 +202,7 @@ class Rating(db.Model):
 
         return '<Rating {} {} {}>'.format(self.user_id, self.book_id, self.value)
 
-    def to_dict(self):
-
-        return {
-            "id": self.id,
-            "book_id": self.book_id,
-            "user_id": self.user_id,
-            "value": self.value
-        }
-
 class Book(db.Model):
-
-    # __searchable__ = ['title']
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(140))
@@ -262,53 +211,3 @@ class Book(db.Model):
     def __repr__(self):
 
         return '<Book {}>'.format(self.title)
-
-    def to_dict(self):
-
-        return {
-            "id": self.id,
-            "title": self.title,
-            "genres": self.genres,
-        }
-
-
-class BookTag(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey("tag.id"))
-    book_id = db.Column(db.Integer, db.ForeignKey("book.id"))
-    count = db.Column(db.Integer)
-
-    def __repr__(self):
-
-        return '<BookTag {} {} {}>'.format(self.book_id, self.tag_id, self.count)
-
-    def to_dict(self):
-
-        return {
-            "id": self.id,
-            "book_id": self.book_id,
-            "tag_id": self.tag_id,
-            "count": self.count
-        }
-
-class Tag(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(140))
-
-    def __repr__(self):
-
-        return '<Tag {}>'.format(self.name)
-
-    def __eq__(self, other):
-
-        return self.name == other.name
-
-    def to_dict(self):
-
-        return {
-            "id": self.id,
-            "name": self.name
-        }
-

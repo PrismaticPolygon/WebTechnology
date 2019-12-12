@@ -3,24 +3,16 @@
 
 {% block app_content %}
 
-    <div class="row">
+    <h2>Books</h2>
 
-        {% for book in books %}
+    <ul>
 
-             <div class="col-12">
+    {% for book in books %}
 
-                {{ book.title }}
+    <li> {{ book.title }} </li>
 
-            </div>
+    {% endfor %}
 
-        {% endfor %}
-
-    </div>
-
-{#    {% for post in posts %}#}
-{##}
-{#        {% include '_post.html' %}#}
-{##}
-{#    {% endfor %}#}
+    </ul>
 
 {% endblock %}
