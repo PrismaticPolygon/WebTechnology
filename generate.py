@@ -82,8 +82,6 @@ if __name__ == "__main__":
     config = Config()
     t = time()
 
-    print(config.SQLALCHEMY_DATABASE_URI)
-
     # Create the database
     engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
 
@@ -92,6 +90,8 @@ if __name__ == "__main__":
         generate_books,
         generate_ratings
     ]
+
+
 
     for generator in generators:
 
