@@ -7,13 +7,14 @@ import pandas as pd
 import random
 import numpy as np
 
-NUMBER_OF_USERS = 10
-books = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/books.csv", index_col="book_id")
+NUMBER_OF_USERS = 50
 
-GENRES = []
+books = pd.read_csv("data/books.csv", index_col="book_id")
+
 NUMBER_OF_BOOKS = len(books)
+GENRES = []
 
-NUMBER_OF_RATINGS = int(NUMBER_OF_BOOKS / 4)
+NUMBER_OF_RATINGS = int(NUMBER_OF_BOOKS / 3)
 
 for genres in books["genres"]:
 
@@ -47,8 +48,6 @@ def generate_ratings():
     ratings = list()
     book_ids = range(1, NUMBER_OF_BOOKS)
 
-    # So we basically wanted a weighted score of each genre. Then we sum them up.
-
     for user_id in range(1, NUMBER_OF_USERS):
 
         user_preferences = np.random.rand(NUMBER_OF_GENRES)
@@ -69,7 +68,7 @@ def generate_ratings():
 
             ratings.append(rating)
 
-    with open("ratings.csv", "w", newline="") as ratings_file:
+    with open("data/ratings.csv", "w", newline="") as ratings_file:
 
         writer = csv.DictWriter(ratings_file, fieldnames=["book_id", "user_id", "value"])
         writer.writeheader()
@@ -124,11 +123,9 @@ if __name__ == "__main__":
 
             data = generator()
 
-            print(data)
+            s.bulk_save_objects(data)
 
-            # s.bulk_save_objects(data)
-            #
-            # s.commit()
+            s.commit()
 
         except Exception as e:
 

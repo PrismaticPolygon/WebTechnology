@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from scipy.sparse.linalg import svds
 
-books = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/books.csv")
-ratings = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/ratings.csv")
+books = pd.read_csv("data/books.csv")
+ratings = pd.read_csv("data/ratings.csv")
 
 print(books.head())
 print(ratings.head())

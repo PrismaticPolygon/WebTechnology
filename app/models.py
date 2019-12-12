@@ -27,10 +27,18 @@ class User(UserMixin, db.Model):
 
     def get_ratings(self):
 
-        ratings = self.ratings.join(Book).add_columns(Book.title, Book.genres).all()
+        ratings = self.ratings.join(Book).add_columns(Book.title, Book.genres, Book.id).all()
 
-        return list(sorted(map(lambda x: {"title": x[1], "rating": x[0].value, "genres": x[2].replace("|", ", ")}, ratings),
-                           key=lambda x: x["rating"], reverse=True))
+        ratings = [{
+            "title": rating[1],
+            "value": rating[0].value,
+            "genres": rating[2].replace("|", ", "),
+            "book_id": rating[3]
+        } for rating in ratings]
+
+        print(ratings)
+
+        return list(sorted(ratings, key=lambda x: x["value"], reverse=True))
 
 
     def get_recommendations(self, num_recommendations=10):
@@ -50,9 +58,9 @@ class User(UserMixin, db.Model):
         user_ratings_mean = np.mean(R, axis=1)
         R_demeaned = R - user_ratings_mean.reshape(-1, 1)
 
-        # 50 is best. So we'll have 50 users in the final iteration!
+        k = min(R_demeaned.shape[0] - 1, 50)
 
-        U, sigma, Vt = svds(R_demeaned, k=5)
+        U, sigma, Vt = svds(R_demeaned, k=k)
         sigma = np.diag(sigma)
 
         predictions = np.dot(np.dot(U, sigma), Vt) + user_ratings_mean.reshape(-1, 1)
@@ -70,12 +78,8 @@ class User(UserMixin, db.Model):
         # Remove books that the user has already rated
         books = books[~books['book_id'].isin(user_full['book_id'])]
 
-        # That is indeed the case.
-
         print("BOOKS\n")
         print(books)
-
-        # Presumably, NAN is what we've already rated.
 
         recommendations = books.merge(user_predictions, how='left', on='book_id').sort_values('value', ascending=False)
         recommendations = recommendations[~recommendations["value"].isna()].iloc[:num_recommendations]

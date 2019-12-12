@@ -3,16 +3,46 @@
 
 {% block app_content %}
 
-    <h2>Books</h2>
+     <h2> Books </h2>
 
-    <ul>
+    <table class="table">
 
-    {% for book in books %}
+        <tr>
 
-    <li> {{ book.title }} </li>
+            <th> ID </th>
 
-    {% endfor %}
+            <th>Title</th>
 
-    </ul>
+            <th>Genres</th>
+
+        </tr>
+
+        {% for book in books %}
+
+            <tr>
+
+                <td>
+
+                    {{ book.id }}
+
+                </td>
+
+                <td>
+
+                    {{ book.title }}
+                </td>
+
+
+                <td>
+
+                    {{ book.genres.replace("|", ", ") }}
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+    </table>
 
 {% endblock %}
