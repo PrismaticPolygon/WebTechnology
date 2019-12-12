@@ -7,7 +7,7 @@ import pandas as pd
 import random
 
 NUMBER_OF_USERS = 10
-books = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/Book1.csv", index_col="book_id")
+books = pd.read_csv("D:/Dev/PycharmProjects/WebTechnology/books.csv", index_col="book_id")
 
 GENRES = []
 NUMBER_OF_BOOKS = len(books)
@@ -64,11 +64,25 @@ def generate_ratings():
 
             if worst_genre in book_genres:
 
-                value = max(0, value - random.choice([2, 3]))
+                value = max(1, value - random.choice([2, 3]))
 
             rating = Rating(book_id=book_id, user_id=user_id, value=value)
 
             ratings.append(rating)
+
+
+    with open("ratings.csv", "w", newline="") as ratings_file:
+
+        writer = csv.DictWriter(ratings_file, fieldnames=["book_id", "user_id", "value"])
+        writer.writeheader()
+
+        for rating in ratings:
+
+            writer.writerow({
+                "user_id": rating.user_id,
+                "book_id": rating.book_id,
+                "value": rating.value
+            })
 
     return ratings
 
@@ -114,9 +128,9 @@ if __name__ == "__main__":
 
             print(data)
 
-            s.bulk_save_objects(data)
-
-            s.commit()
+            # s.bulk_save_objects(data)
+            #
+            # s.commit()
 
         except Exception as e:
 
