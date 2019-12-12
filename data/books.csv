@@ -1,4 +1,4 @@
-book_id,title,genres
+id,title,genres
 1,"The Testaments (The Handmaid's Tale, #2)",Fiction|Science Fiction|Dystopia
 2,Where the Forest Meets the Stars,Fiction|Contemporary|Mystery
 3,Normal People,Fiction|Contemporary|Literary Fiction
@@ -74,7 +74,7 @@ book_id,title,genres
 73,The Truth About Magic,Poetry
 74,Lord of the Butterflies,Poetry|LGBT
 75,Great Goddesses: Life Lessons from Myths and Monsters,Poetry|Mythology|Fantasy
-76,The Silent Patient,Mystery|Thriller|Fiction
+76,The Hobbit,Fantasy|Action|Adventure|Fiction
 77,The Ten Thousand Doors of January,Fantasy|Historical Fiction|Fiction|Young Adult|History
 78,The Water Dancer,Historical Fiction|Fiction|Fantasy|History
 79,Five Feet Apart,Young Adult|Romance|Contemporary|Fiction

@@ -8,23 +8,20 @@ import random
 import numpy as np
 
 NUMBER_OF_USERS = 50
+NUMBER_OF_BOOKS = 100
+NUMBER_OF_GENRES = 41
+MIN_NUMBER_OF_RATINGS = 10
+MAX_NUMBER_OF_RATINGS = 50
 
-books = pd.read_csv("data/books.csv", index_col="book_id")
+GENRES = ['Action', 'Adult', 'Adult Fiction', 'Adventure', 'Animals', 'Biography', 'Childrens', 'Comics',
+          'Contemporary', 'Crime', 'Death', 'Dystopia', 'Environment', 'Family', 'Fantasy', 'Fiction', 'Food and Drink',
+          'Graphic Novels', 'Health', 'Historical Fiction', 'History', 'Horror', 'Humor', 'LGBT', 'Literary Fiction',
+          'Memoir', 'Music', 'Mystery', 'Mythology', 'Nonfiction', 'Parenting', 'Picture Books', 'Poetry', 'Politics',
+          'Romance', 'Science', 'Science Fiction', 'Self Help', 'Thriller', 'War', 'Young Adult']
 
-NUMBER_OF_BOOKS = len(books)
-GENRES = []
+# What! Where
 
-NUMBER_OF_RATINGS = int(NUMBER_OF_BOOKS / 3)
-
-for genres in books["genres"]:
-
-    for genre in genres.split("|"):
-
-        if genre not in GENRES:
-
-            GENRES.append(genre)
-
-NUMBER_OF_GENRES = len(GENRES)
+books_df = pd.read_csv("data/books.csv", index_col="id")
 
 def generate_users():
 
@@ -39,61 +36,57 @@ def generate_users():
 
     return users
 
-def round_rating(number):
-
-    return round(number * 2) / 2
-
 def generate_ratings():
 
     ratings = list()
-    book_ids = range(1, NUMBER_OF_BOOKS)
 
-    for user_id in range(1, NUMBER_OF_USERS):
+    # Iterate through each user
+    for user_id in range(1, NUMBER_OF_USERS + 1):
 
+        # Generate a random genre preference array
         user_preferences = np.random.rand(NUMBER_OF_GENRES)
 
-        for book_id in random.choices(book_ids, k=NUMBER_OF_RATINGS):
+        n = random.randint(MIN_NUMBER_OF_RATINGS, MAX_NUMBER_OF_RATINGS)
 
-            book_genres = books.iloc[book_id].genres.split("|")
+        # Iterate over a random sample of n books
+        for book_id, (title, genres) in books_df.sample(n).iterrows():
 
+            book_genres = genres.split("|")
             value = 0
 
             for genre in book_genres:
 
                 value += user_preferences[GENRES.index(genre)]
 
-            value = round_rating((5 * value) / len(book_genres))
+            # Convert to a half-decimal between 0 and 5
+            value = round(2 * (5 * value) / len(book_genres)) / 2
 
             rating = Rating(book_id=book_id, user_id=user_id, value=value)
 
             ratings.append(rating)
 
-    with open("data/ratings.csv", "w", newline="") as ratings_file:
-
-        writer = csv.DictWriter(ratings_file, fieldnames=["book_id", "user_id", "value"])
-        writer.writeheader()
-
-        for rating in ratings:
-
-            writer.writerow({
-                "user_id": rating.user_id,
-                "book_id": rating.book_id,
-                "value": rating.value
-            })
+    # with open("data/ratings.csv", "w", newline="") as ratings_file:
+    #
+    #     writer = csv.DictWriter(ratings_file, fieldnames=["id", "book_id", "user_id", "value"])
+    #     writer.writeheader()
+    #
+    #     for rating in ratings:
+    #
+    #         writer.writerow(rating.to_dict())
 
     return ratings
 
 def generate_books():
 
-    _books = list()
+    books = list()
 
-    for index, (title, genres) in books.iterrows():
+    for index, (title, genres) in books_df.iterrows():
 
         book = Book(title=title, genres=genres)
 
-        _books.append(book)
+        books.append(book)
 
-    return _books
+    return books
 
 if __name__ == "__main__":
 
@@ -104,13 +97,13 @@ if __name__ == "__main__":
 
     generators = [
         generate_users,
-        generate_ratings,
-        generate_books
+        generate_books,
+        generate_ratings
     ]
 
     for generator in generators:
 
-        print("Running " + generator.__name__)
+        print("Running " + generator.__name__ + "...", end="")
 
         t = time()
 
@@ -135,4 +128,4 @@ if __name__ == "__main__":
 
             s.close()
 
-        print("Time elapsed: {}s\n".format(str(time() - t)))  # 0.091s
+        print("DONE ({}s)".format(str(time() - t)))  # 0.091s

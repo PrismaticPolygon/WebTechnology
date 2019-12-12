@@ -1,11 +1,10 @@
 from datetime import datetime
-from flask import render_template, flash, redirect, url_for, request, g, jsonify, current_app
+from flask import render_template, redirect, url_for, request, g, jsonify
 from flask_login import current_user, login_required
 from flask_babel import _, get_locale
 from app import db
-from app.main.forms import EditProfileForm, RateBookForm
+from app.main.forms import RateBookForm
 from app.models import User, Book, Rating
-from app.translate import translate
 from app.main import bp
 
 
@@ -19,8 +18,8 @@ def before_request():
 
     g.locale = str(get_locale())
 
-@bp.route('/', methods=['GET', 'POST'])
-@bp.route('/index', methods=['GET', 'POST'])
+@bp.route('/')
+@bp.route('/index')
 def index():
 
     books = Book.query.all()
@@ -35,30 +34,26 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     form = RateBookForm()
 
-    if request.method == "POST":
+    if form.validate_on_submit():
 
-        if form.validate_on_submit():   # I.e. it passes. Then we change or update the correct rating.
+        user_id = current_user.id
+        book_id = form.book_id
 
-            user_id = current_user.id
-            book_id = form.get_book_id()
+        rating = Rating.query.filter_by(book_id=book_id, user_id=user_id).first()
 
-            rating = Rating.query.filter_by(book_id=book_id, user_id=user_id).first()
+        if rating is None:
 
-            if rating is None:
-
-                rating = Rating(book_id=book_id, user_id=user_id, value=form.rating.data)
-
-            else:
-
-                rating.value = form.rating.data
+            rating = Rating(book_id=book_id, user_id=user_id, value=form.rating.data)
 
             db.session.add(rating)
 
-            db.session.commit()
+        else:
 
-            # Wait. I need to book_id, right? Is there anyway to get it.
+            rating.value = form.rating.data
 
-            print(user_id, book_id)
+        db.session.commit()
+
+        return redirect(url_for('main.user', username=user.username))
 
     ratings = user.get_ratings()
     recommendations = user.get_recommendations()
@@ -68,38 +63,3 @@ def user(username):
                            ratings=ratings,
                            recommendations=recommendations,
                            form=form)
-
-
-@bp.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-
-    form = EditProfileForm(current_user.username)
-
-    if form.validate_on_submit():
-
-        current_user.username = form.username.data
-        current_user.about_me = form.about_me.data
-
-        db.session.commit()
-
-        flash(_('Your changes have been saved.'))
-
-        return redirect(url_for('main.edit_profile'))
-
-    elif request.method == 'GET':
-
-        form.username.data = current_user.username
-
-        form.about_me.data = current_user.about_me
-
-    return render_template('edit_profile.html', title=_('Edit Profile'), form=form)
-
-
-@bp.route('/translate', methods=['POST'])
-@login_required
-def translate_text():
-
-    return jsonify({'text': translate(request.form['text'],
-                                      request.form['source_language'],
-                                      request.form['dest_language'])})

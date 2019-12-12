@@ -58,7 +58,6 @@
 
     <div class="container">
 
-        {# application content needs to be provided in the app_content block #}
         {% block app_content %}{% endblock %}
 
     </div>
@@ -70,21 +69,5 @@
     {{ super() }}
     {{ moment.include_moment() }}
     {{ moment.lang(g.locale) }}
-
-    <script>
-
-        function translate(sourceElem, destElem, sourceLang, destLang) {
-            $.post('/translate', {
-                text: $(sourceElem).text(),
-                source_language: sourceLang,
-                dest_language: destLang
-            }).done(function (response) {
-                $(destElem).text(response['text'])
-            }).fail(function () {
-                $(destElem).text("{{ _('Error: Could not contact server.') }}");
-            });
-        }
-
-    </script>
 
 {% endblock %}

@@ -3,7 +3,7 @@
 
 {% block app_content %}
 
-    <table class="table table-hover" style="width:100%; border-collapse: collapse">
+    <table class="table table-hover" style="width:50%; border-collapse: collapse">
 
         <tr>
 
@@ -13,17 +13,13 @@
 
                 <h1>{{ user.username }}</h1>
 
-                    {% if user.about_me %}
-
-                        <p>{{ user.about_me }}</p>
-
-                    {% endif %}
-
                     {% if user.last_seen %}
 
                         <p>{{ _('Last seen on') }}: {{ moment(user.last_seen).format('LLL') }}</p>
 
                     {% endif %}
+
+                <p>ID: {{ user.id }}</p>
 
             </td>
 
@@ -35,7 +31,7 @@
 
         <div class="col-md-6">
 
-            <h2> Rate a book</h2>
+            <h2> {{ _("Rate a book") }}</h2>
 
             {{ wtf.quick_form(form) }}
 
@@ -43,19 +39,27 @@
 
     </div>
 
-    <h2> Recommendations </h2>
+    {% if ratings == [] %}
+
+        <h2> {{ _("Recommendations (random)") }} </h2>
+
+    {% else %}
+
+        <h2> {{ _("Recommendations") }} </h2>
+
+    {% endif %}
 
     <table class="table">
 
         <tr>
 
-            <th> ID </th>
+            <th>{{ _("ID") }}</th>
 
-            <th>Title</th>
+            <th>{{ _("Title") }}</th>
 
-            <th>Predicted rating</th>
+            <th>{{ _("Value") }}</th>
 
-            <th>Genres</th>
+            <th>{{ _("Genres") }}</th>
 
         </tr>
 
@@ -92,52 +96,60 @@
     </table>
 
 
-    <h2> Ratings </h2>
+    {% if ratings == [] %}
 
-    <table class="table">
+        <h2 style="text-align: center">{{ _("Rate a book to start receiving personalised recommendations!") }}</h2>
 
-        <tr>
+    {% else %}
 
-            <th> ID </th>
+        <h2> {{ _("Ratings") }} </h2>
 
-            <th>Title</th>
-
-            <th>Rating</th>
-
-            <th>Genres</th>
-
-        </tr>
-
-        {% for rating in ratings %}
+        <table class="table">
 
             <tr>
 
-                <td>
+               <th>{{ _("ID") }}</th>
 
-                    {{ rating.book_id }}
+                <th>{{ _("Title") }}</th>
 
-                </td>
+                <th>{{ _("Rating") }}</th>
 
-                <td>
-                    {{ rating.title }}
-                </td>
-
-                <td>
-
-                    {{ rating.value }}
-
-                </td>
-
-                <td>
-
-                    {{ rating.genres }}
-
-                </td>
+                <th>{{ _("Genres") }}</th>
 
             </tr>
 
-        {% endfor %}
+            {% for rating in ratings %}
 
-    </table>
+                <tr>
+
+                    <td>
+
+                        {{ rating.book_id }}
+
+                    </td>
+
+                    <td>
+                        {{ rating.title }}
+                    </td>
+
+                    <td>
+
+                        {{ rating.value }}
+
+                    </td>
+
+                    <td>
+
+                        {{ rating.genres }}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </table>
+
+    {% endif %}
 
 {% endblock %}

@@ -47,6 +47,17 @@ recommendation algorithm. [50]
 4. Provide a suitable interface for a user to interact with the system, supporting user profile
 creation and/or update and receiving book recommendations
 
+## Languages
+
+These commands can be called using:
+`flask translate init LANG`
+`flask translate update`
+`flask translate compile`
+
+To extract all texts to the .pot file, use the following command: `pybabel extract -F babel.cfg -k _l -o messages.pot`.
+To add a new language, run `pybabel init -i messages.pot -d app/translations -l LANGUAGE_CODE`.
+To compile all the translations for the application, use `pybabel compile -d app/translations`
+
 ## TODO
 
 - [ ] Update home page to show books

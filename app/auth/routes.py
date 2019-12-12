@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_babel import _
@@ -23,8 +23,6 @@ def login():
 
         if user is None or not user.check_password(form.password.data):
 
-            flash(_('Invalid username or password'))
-
             return redirect(url_for('auth.login'))
 
         login_user(user, remember=form.remember_me.data)
@@ -33,8 +31,6 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
 
             next_page = url_for('main.user', username=form.username.data)
-
-        print("Next page", next_page)
 
         return redirect(next_page)
 
@@ -65,8 +61,6 @@ def register():
 
         db.session.add(user)
         db.session.commit()
-
-        flash(_('Congratulations, you are now a registered user!'))
 
         return redirect(url_for('auth.login'))
 
