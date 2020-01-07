@@ -40,10 +40,14 @@ be extended to the books themselves or other languages.
 
 This should prove unnecessary. The system has been tested with Python 3.6. If running locally is necessary,
 run the following commands:
-* `pip install -r requirements.txt`
-* `flask db init`
-* `flask db upgrade`
-* `flask translate init`
-* `flask translate compile`
-
-Finally, to launch the site, run `flask run`, and navigate to `127.0.0.1/5000`.
+* Create a virtual environment using `python -m venv`
+* Activate the virtual environment by:
+    * `cd venv/Scripts`
+    * `activate`
+    * `cd ../..`
+* Install the required packages using `pip install -r requirements.txt`
+* Initialise the database using `flask db upgrade`
+* Fill the database using `python generate.py`
+* Compile translations using `flask translate compile`
+* Run using `flask run`. 
+* Navigate to to `127.0.0.1/5000`.
