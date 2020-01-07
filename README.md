@@ -35,3 +35,15 @@ with some tweaks.
 
 The website is available in both English and German. Translation is handled by `Babel`. Translations could easily
 be extended to the books themselves or other languages. 
+
+### Running locally.
+
+This should prove unnecessary. The system has been tested with Python 3.6. If running locally is necessary,
+run the following commands:
+* `pip install -r requirements.txt`
+* `flask db init`
+* `flask db upgrade`
+* `flask translate init`
+* `flask translate compile`
+
+Finally, to launch the site, run `flask run`, and navigate to `127.0.0.1/5000`.
